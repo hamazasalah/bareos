@@ -61,6 +61,8 @@ class DbCopy {
       throw std::runtime_error("destination database is not postgresql");
 
     ParseConfig();
+    std::cout << "Copying tables from " << cl.source_db_resource_name << " to "
+              << cl.destination_db_resource_name << std::endl;
     ConnectToDatabases();
   }
 
@@ -188,8 +190,6 @@ class DbCopy {
               _("Usage: bareos-dbcopy [options] Source Destination\n"
                 "        -c <path>   use <path> as configuration file or "
                 "directory\n"
-                "        -e          examine (compare) all rows"
-                "        -l <number> limit amount of copy to number of rows"
                 "        -?          print this message.\n"
                 "\n"));
     }
@@ -233,6 +233,6 @@ int main(int argc, char** argv)
     }
     return 1;
   }
-  std::cout << "Successfully converted database" << std::endl;
+  std::cout << "database copy completed successfully" << std::endl;
   return 0;
 }
