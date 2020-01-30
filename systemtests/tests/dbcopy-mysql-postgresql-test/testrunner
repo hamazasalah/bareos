@@ -31,13 +31,8 @@ echo "$conf"  >  "$tmp/file-list-python-plugin"
 
 start_test
 
-<<<<<<< HEAD
-#enable only mysql (disable postgresql)
-mv "${conf}"/bareos-dir.d/catalog/postgresql.conf "${conf}"/bareos-dir.d/catalog/postgresql.conf.disabled
-=======
 #enable only mysql
-cp "${conf}"/bareos-dir.d/catalog/postgresql.conf "${conf}"/bareos-dir.d/catalog/postgresql.conf.disabled
->>>>>>> systemtests: enable only the used database for dbcopy
+mv "${conf}"/bareos-dir.d/catalog/postgresql.conf "${conf}"/bareos-dir.d/catalog/postgresql.conf.disabled
 
 cat <<END_OF_DATA >$tmp/bconcmds
 @$out /dev/null
@@ -60,23 +55,13 @@ run_bareos
 stop_bareos
 
 #enable mysql and postgresql
-<<<<<<< HEAD
 mv "${conf}"/bareos-dir.d/catalog/postgresql.conf.disabled "${conf}"/bareos-dir.d/catalog/postgresql.conf
-=======
-cp "${conf}"/bareos-dir.d/catalog/postgresql.conf.disabled "${conf}"/bareos-dir.d/catalog/postgresql.conf
->>>>>>> systemtests: enable only the used database for dbcopy
 
 #do the database copy
 "${sbin}"/bareos-dbcopy -d -c ${current_test_directory}/etc/bareos mysql postgresql
 
-<<<<<<< HEAD
-#enable only postgresql (disable mysql)
-mv "${conf}"/bareos-dir.d/catalog/mysql.conf "${conf}"/bareos-dir.d/catalog/mysql.conf.disabled
-=======
 #enable only postgresql
-cp "${conf}"/bareos-dir.d/catalog/postgresql.conf.disabled "${conf}"/bareos-dir.d/catalog/postgresql.conf
-cp "${conf}"/bareos-dir.d/catalog/mysql.conf "${conf}"/bareos-dir.d/catalog/mysql.conf.disabled
->>>>>>> systemtests: enable only the used database for dbcopy
+mv "${conf}"/bareos-dir.d/catalog/mysql.conf "${conf}"/bareos-dir.d/catalog/mysql.conf.disabled
 
 cat <<END_OF_DATA >$tmp/bconcmds
 @#
