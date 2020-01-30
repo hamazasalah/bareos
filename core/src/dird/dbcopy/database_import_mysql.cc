@@ -70,8 +70,13 @@ struct ResultHandlerContext {
       const DatabaseColumnDescriptions::VectorOfColumnDescriptions& c,
       RowData& d,
       DatabaseExport& e,
-      BareosDb* db_in)
-      : column_descriptions(c), row_data(d), exporter(e), db(db_in)
+      BareosDb* db_in,
+      bool is_restore_object_in)
+      : column_descriptions(c)
+      , row_data(d)
+      , exporter(e)
+      , db(db_in)
+      , is_restore_object(is_restore_object_in)
   {
   }
   const DatabaseColumnDescriptions::VectorOfColumnDescriptions&
@@ -79,7 +84,8 @@ struct ResultHandlerContext {
   RowData& row_data;
   DatabaseExport& exporter;
   uint64_t counter{};
-  BareosDb* db;
+  BareosDb* db{};
+  bool is_restore_object{};
 };
 
 void DatabaseImportMysql::RunQuerySelectAllRows(
@@ -100,6 +106,13 @@ void DatabaseImportMysql::RunQuerySelectAllRows(
       query += "`, `";
     }
     query.resize(query.size() - 3);
+
+    bool is_restore_object = false;
+    if (t.table_name == "RestoreObject") {
+      query += ", length(`RestoreObject`) as `length_of_restore_object`";
+      is_restore_object = true;
+    }
+
     query += " FROM ";
     query += t.table_name;
 
@@ -109,7 +122,8 @@ void DatabaseImportMysql::RunQuerySelectAllRows(
     }
 
     RowData row_data(t.column_descriptions, t.table_name);
-    ResultHandlerContext ctx(t.column_descriptions, row_data, exporter, db_);
+    ResultHandlerContext ctx(t.column_descriptions, row_data, exporter, db_,
+                             is_restore_object);
 
     if (!db_->SqlQuery(query.c_str(), ResultHandler, &ctx)) {
       std::cout << "Could not import table: " << t.table_name << std::endl;
@@ -148,15 +162,27 @@ void DatabaseImportMysql::FillRowWithDatabaseResult(ResultHandlerContext* r,
                                                     int fields,
                                                     char** row)
 {
-  if (fields != static_cast<int>(r->column_descriptions.size())) {
+  std::size_t number_of_fields{};
+  number_of_fields = r->column_descriptions.size();
+  if (r->is_restore_object) {
+    ++number_of_fields;  // one more for length_of_restore_object
+  }
+
+  if (fields != static_cast<int>(number_of_fields)) {
     throw std::runtime_error(
         "Number of database fields does not match description");
   }
 
-  for (int i = 0; i < fields; i++) {
-    RowData& row_data = r->row_data;
-    row_data.row[i].data_pointer = row[i];
-    r->column_descriptions[i]->db_import_converter(r->db, row_data.row[i]);
+  RowData& row_data = r->row_data;
+
+  for (std::size_t i = 0; i < r->column_descriptions.size(); i++) {
+    row_data.columns[i].data_pointer = row[i];
+    r->column_descriptions[i]->db_import_converter(r->db, row_data.columns[i]);
+  }
+
+  if (r->is_restore_object) {
+    std::istringstream iss(row[fields - 1]);
+    iss >> row_data.columns[fields - 1].size;
   }
 }
 
