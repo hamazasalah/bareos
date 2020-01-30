@@ -82,8 +82,9 @@ endmacro()
 macro(handle_python_plugin_modules test_name)
   set(PYMODULES_TO_LINK_TO_SRC)
 
+  string(REGEX MATCH ^dbcopy.* starts_with_dbcopy ${test_name})
   string(REGEX MATCH ^python-fd.* starts_with_python-fd ${test_name})
-  if(starts_with_python-fd)
+  if(starts_with_python-fd OR starts_with_dbcopy)
     list(APPEND PYMODULES_TO_LINK_TO_SRC filed/BareosFdWrapper.py
                 filed/BareosFdPluginBaseclass.py filed/bareos_fd_consts.py
                 filed/bareos-fd-mock-test.py
