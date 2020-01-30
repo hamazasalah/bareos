@@ -69,31 +69,7 @@ static void string_conversion_postgresql(BareosDb* db, ColumnData& fd)
   if (fd.data_pointer) {
     std::size_t len{strlen(fd.data_pointer)};
     fd.converted_data.resize(len * 2 + 1);
-#if 1
     db->EscapeString(nullptr, fd.converted_data.data(), fd.data_pointer, len);
-#else
-    char* n = fd.converted_data.data();
-    const char* o = fd.data_pointer;
-
-    while (len--) {
-      switch (*o) {
-        case '\'':
-          *n++ = '\'';
-          *n++ = '\'';
-          o++;
-          break;
-        case 0:
-          *n++ = '\\';
-          *n++ = 0;
-          o++;
-          break;
-        default:
-          *n++ = *o++;
-          break;
-      }
-    }
-    *n = 0;
-#endif
     fd.data_pointer = fd.converted_data.data();
   } else {
     fd.data_pointer = "";
@@ -103,7 +79,7 @@ static void string_conversion_postgresql(BareosDb* db, ColumnData& fd)
 static void bytea_conversion_postgresql(BareosDb* db, ColumnData& fd)
 {
   std::size_t new_len{};
-  std::size_t old_len = strlen(fd.data_pointer);
+  std::size_t old_len = fd.size;
 
   auto old = reinterpret_cast<const unsigned char*>(fd.data_pointer);
 
