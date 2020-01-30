@@ -61,18 +61,25 @@ class DbCopy {
       throw std::runtime_error("destination database is not postgresql");
 
     ParseConfig();
-    std::cout << "Copying tables from " << cl.source_db_resource_name << " to "
-              << cl.destination_db_resource_name << std::endl;
+    std::cout << "Copying tables from \"" << cl.source_db_resource_name
+              << "\" to \"" << cl.destination_db_resource_name << "\""
+              << std::endl;
     ConnectToDatabases();
   }
 
   void DoDatabaseCopy()
   {
+    std::cout << "gathering info about source catalog \""
+              << cl.source_db_resource_name << "\"..." << std::endl;
     std::unique_ptr<DatabaseImport> imp(
         DatabaseImport::Create(*source_db_, cl.maximum_number_of_rows));
+
+    std::cout << "gathering info about destination catalog \""
+              << cl.destination_db_resource_name << "\"..." << std::endl;
     std::unique_ptr<DatabaseExport> exp(
         DatabaseExport::Create(*destination_db_, cl.empty_destination_tables));
 
+    std::cout << "copying tables..." << std::endl;
     imp->ExportTo(*exp);
 
     //    if (cl.compare_all_rows) { imp->CompareWith(*exp); }
