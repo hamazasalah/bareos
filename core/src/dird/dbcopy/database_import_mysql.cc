@@ -159,6 +159,34 @@ void DatabaseImportMysql::CompareWith(DatabaseExport& exporter)
   RunQuerySelectAllRows(ResultHandlerCompare, exporter);
 }
 
+static void ReadoutSizeOfRestoreObject(ResultHandlerContext* r,
+                                       RowData& row_data,
+                                       int fields,
+                                       char** row)
+{
+  auto invalid = std::numeric_limits<std::size_t>::max();
+  std::size_t index_of_restore_object = invalid;
+
+  for (std::size_t i = 0; i < r->column_descriptions.size(); i++) {
+    if (r->column_descriptions[i]->data_type == "longblob") {
+      index_of_restore_object = i;
+      break;
+    }
+  }
+
+  if (index_of_restore_object == invalid) {
+    throw std::runtime_error("No longblob object found as restore object");
+  }
+
+  std::size_t result_index_of_restore_object_size = fields - 1;
+
+  std::size_t size{};
+  std::istringstream(row[result_index_of_restore_object_size]) >> size;
+  row_data.columns[result_index_of_restore_object_size].size = size;
+  row_data.columns[index_of_restore_object].size = size;
+}
+
+
 void DatabaseImportMysql::FillRowWithDatabaseResult(ResultHandlerContext* r,
                                                     int fields,
                                                     char** row)
@@ -177,27 +205,9 @@ void DatabaseImportMysql::FillRowWithDatabaseResult(ResultHandlerContext* r,
   RowData& row_data = r->row_data;
 
   if (r->is_restore_object) {
-    auto invalid = std::numeric_limits<std::size_t>::max();
-    std::size_t index_of_restore_object = invalid;
-
-    for (std::size_t i = 0; i < r->column_descriptions.size(); i++) {
-      if (r->column_descriptions[i]->data_type == "longblob") {
-        index_of_restore_object = i;
-        break;
-      }
-    }
-
-    if (index_of_restore_object == invalid) {
-      throw std::runtime_error("No longblob object found as restore object");
-    }
-
-    std::size_t result_index_of_restore_object_size = fields - 1;
-
-    std::size_t size{};
-    std::istringstream(row[result_index_of_restore_object_size]) >> size;
-    row_data.columns[result_index_of_restore_object_size].size = size;
-    row_data.columns[index_of_restore_object].size = size;
+    ReadoutSizeOfRestoreObject(r, row_data, fields, row);
   }
+
   for (std::size_t i = 0; i < r->column_descriptions.size(); i++) {
     row_data.columns[i].data_pointer = row[i];
     r->column_descriptions[i]->db_import_converter(r->db, row_data.columns[i]);

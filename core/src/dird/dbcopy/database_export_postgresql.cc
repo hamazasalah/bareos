@@ -59,48 +59,39 @@ DatabaseExportPostgresql::~DatabaseExportPostgresql()
   if (transaction_) { db_->SqlQuery("ROLLBACK"); }
 }
 
-void DatabaseExportPostgresql::CopyRow(RowData& source_row_data)
+void DatabaseExportPostgresql::CopyRow(RowData& source_data_row)
 {
   std::string query_into{"INSERT INTO "};
-  query_into += source_row_data.table_name;
+  query_into += source_data_row.table_name;
   query_into += " (";
 
   std::string query_values = " VALUES (";
 
-  if (source_row_data.is_restore_object) {
-    std::size_t restore_object_size{};
-    std::size_t restore_object_length_index{};
-
-    for (std::size_t i = 0; i < source_row_data.column_descriptions.size();
+  if (source_data_row.is_restore_object) {
+    for (std::size_t i = 0; i < source_data_row.column_descriptions.size();
          i++) {
       const ColumnDescription* column_description =
           table_descriptions_->GetColumnDescription(
-              source_row_data.table_name,
-              source_row_data.column_descriptions[i]->column_name);
+              source_data_row.table_name,
+              source_data_row.column_descriptions[i]->column_name);
 
       if (!column_description) {
         std::string err{"Could not get column description for: "};
-        err += source_row_data.column_descriptions[i]->column_name;
+        err += source_data_row.column_descriptions[i]->column_name;
         throw std::runtime_error(err);
       }
 
-      if (i < source_row_data.columns.size()) {
+      if (i < source_data_row.columns.size()) {
         if (column_description->column_name == "restoreobject") {
-          restore_object_size =
-              source_row_data.columns[i].converted_data.size();
         } else if (column_description->column_name == "objectlength") {
-          source_row_data.columns[i].scratch_data =
-              std::to_string(restore_object_size);
-          source_row_data.columns[i].data_pointer =
-              source_row_data.columns[i].scratch_data.data();
         } else {
           column_description->db_export_converter(db_,
-                                                  source_row_data.columns[i]);
+                                                  source_data_row.columns[i]);
           query_into += column_description->column_name;
           query_into += ", ";
 
           query_values += "'";
-          query_values += source_row_data.columns[i].data_pointer;
+          query_values += source_data_row.columns[i].data_pointer;
           query_values += "',";
         }
       } else {
@@ -108,28 +99,28 @@ void DatabaseExportPostgresql::CopyRow(RowData& source_row_data)
             "Row number does not match column description");
       }
     }
-  } else {  // !source_row_data->is_restore_object
-    for (std::size_t i = 0; i < source_row_data.column_descriptions.size();
+  } else {  // !source_data_row->is_restore_object
+    for (std::size_t i = 0; i < source_data_row.column_descriptions.size();
          i++) {
       const ColumnDescription* column_description =
           table_descriptions_->GetColumnDescription(
-              source_row_data.table_name,
-              source_row_data.column_descriptions[i]->column_name);
+              source_data_row.table_name,
+              source_data_row.column_descriptions[i]->column_name);
 
       if (!column_description) {
         std::string err{"Could not get column description for: "};
-        err += source_row_data.column_descriptions[i]->column_name;
+        err += source_data_row.column_descriptions[i]->column_name;
         throw std::runtime_error(err);
       }
 
       query_into += column_description->column_name;
       query_into += ", ";
 
-      if (i < source_row_data.columns.size()) {
+      if (i < source_data_row.columns.size()) {
         query_values += "'";
         column_description->db_export_converter(db_,
-                                                source_row_data.columns[i]);
-        query_values += source_row_data.columns[i].data_pointer;
+                                                source_data_row.columns[i]);
+        query_values += source_data_row.columns[i].data_pointer;
         query_values += "',";
       } else {
         throw std::runtime_error(

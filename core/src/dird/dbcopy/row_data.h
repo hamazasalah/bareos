@@ -32,7 +32,6 @@ struct ColumnData {
   std::size_t size{};  // length_of_restore_object
   const char* data_pointer{};
   std::vector<char> converted_data;
-  std::string scratch_data;
 };
 
 struct RowData {
