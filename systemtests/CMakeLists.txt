@@ -135,6 +135,7 @@ macro(handle_python_plugin_modules test_name)
     file(MAKE_DIRECTORY ${python_plugin_module_src_test_dir})
   endif()
 
+
   foreach(PYMODULE_SOURCEPATH ${PYMODULES_TO_LINK_TO_SRC})
     get_filename_component(PYMODULE_NAME ${PYMODULE_SOURCEPATH} NAME)
     execute_process(
@@ -285,6 +286,7 @@ set(mon_dir_password "mon_dir_password")
 set(mon_fd_password "mon_fd_password")
 set(mon_sd_password "mon_sd_password")
 set(python_plugin_module_src_dir ${CMAKE_SOURCE_DIR}/core/src/plugins)
+set(python_plugin_module_src_test_dir_relative "python-modules")
 set(plugindirtmp ${PROJECT_BINARY_DIR}/plugindirtmp)
 set(rscripts ${PROJECT_BINARY_DIR}/scripts)
 
