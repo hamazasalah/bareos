@@ -43,8 +43,7 @@ struct RowData {
       , column_descriptions(column_descriptions_in)
       , is_restore_object(is_restore_object_in)
   {
-    columns.resize(column_descriptions.size() +
-                   1);  // + length_of_restore_object
+    columns.resize(column_descriptions.size());
   }
 
   std::string table_name;

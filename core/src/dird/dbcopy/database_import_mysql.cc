@@ -161,7 +161,7 @@ void DatabaseImportMysql::CompareWith(DatabaseExport& exporter)
 
 static void ReadoutSizeOfRestoreObject(ResultHandlerContext* r,
                                        RowData& row_data,
-                                       int fields,
+                                       int field_index_longblob,
                                        char** row)
 {
   auto invalid = std::numeric_limits<std::size_t>::max();
@@ -178,12 +178,8 @@ static void ReadoutSizeOfRestoreObject(ResultHandlerContext* r,
     throw std::runtime_error("No longblob object found as restore object");
   }
 
-  std::size_t result_index_of_restore_object_size = fields - 1;
-
-  std::size_t size{};
-  std::istringstream(row[result_index_of_restore_object_size]) >> size;
-  row_data.columns[result_index_of_restore_object_size].size = size;
-  row_data.columns[index_of_restore_object].size = size;
+  std::istringstream(row[field_index_longblob]) >>
+      row_data.columns[index_of_restore_object].size;
 }
 
 
@@ -191,8 +187,8 @@ void DatabaseImportMysql::FillRowWithDatabaseResult(ResultHandlerContext* r,
                                                     int fields,
                                                     char** row)
 {
-  std::size_t number_of_fields{};
-  number_of_fields = r->column_descriptions.size();
+  std::size_t number_of_fields = r->column_descriptions.size();
+
   if (r->is_restore_object) {
     ++number_of_fields;  // one more for length_of_restore_object
   }
@@ -205,7 +201,8 @@ void DatabaseImportMysql::FillRowWithDatabaseResult(ResultHandlerContext* r,
   RowData& row_data = r->row_data;
 
   if (r->is_restore_object) {
-    ReadoutSizeOfRestoreObject(r, row_data, fields, row);
+    std::size_t field_index_longblob = fields - 1;
+    ReadoutSizeOfRestoreObject(r, row_data, field_index_longblob, row);
   }
 
   for (std::size_t i = 0; i < r->column_descriptions.size(); i++) {

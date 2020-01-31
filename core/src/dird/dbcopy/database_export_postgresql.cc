@@ -67,65 +67,28 @@ void DatabaseExportPostgresql::CopyRow(RowData& source_data_row)
 
   std::string query_values = " VALUES (";
 
-  if (source_data_row.is_restore_object) {
-    for (std::size_t i = 0; i < source_data_row.column_descriptions.size();
-         i++) {
-      const ColumnDescription* column_description =
-          table_descriptions_->GetColumnDescription(
-              source_data_row.table_name,
-              source_data_row.column_descriptions[i]->column_name);
+  for (std::size_t i = 0; i < source_data_row.column_descriptions.size(); i++) {
+    const ColumnDescription* column_description =
+        table_descriptions_->GetColumnDescription(
+            source_data_row.table_name,
+            source_data_row.column_descriptions[i]->column_name);
 
-      if (!column_description) {
-        std::string err{"Could not get column description for: "};
-        err += source_data_row.column_descriptions[i]->column_name;
-        throw std::runtime_error(err);
-      }
-
-      if (i < source_data_row.columns.size()) {
-        if (column_description->column_name == "restoreobject") {
-        } else if (column_description->column_name == "objectlength") {
-        } else {
-          column_description->db_export_converter(db_,
-                                                  source_data_row.columns[i]);
-          query_into += column_description->column_name;
-          query_into += ", ";
-
-          query_values += "'";
-          query_values += source_data_row.columns[i].data_pointer;
-          query_values += "',";
-        }
-      } else {
-        throw std::runtime_error(
-            "Row number does not match column description");
-      }
+    if (!column_description) {
+      std::string err{"Could not get column description for: "};
+      err += source_data_row.column_descriptions[i]->column_name;
+      throw std::runtime_error(err);
     }
-  } else {  // !source_data_row->is_restore_object
-    for (std::size_t i = 0; i < source_data_row.column_descriptions.size();
-         i++) {
-      const ColumnDescription* column_description =
-          table_descriptions_->GetColumnDescription(
-              source_data_row.table_name,
-              source_data_row.column_descriptions[i]->column_name);
 
-      if (!column_description) {
-        std::string err{"Could not get column description for: "};
-        err += source_data_row.column_descriptions[i]->column_name;
-        throw std::runtime_error(err);
-      }
+    query_into += column_description->column_name;
+    query_into += ", ";
 
-      query_into += column_description->column_name;
-      query_into += ", ";
-
-      if (i < source_data_row.columns.size()) {
-        query_values += "'";
-        column_description->db_export_converter(db_,
-                                                source_data_row.columns[i]);
-        query_values += source_data_row.columns[i].data_pointer;
-        query_values += "',";
-      } else {
-        throw std::runtime_error(
-            "Row number does not match column description");
-      }
+    if (i < source_data_row.columns.size()) {
+      query_values += "'";
+      column_description->db_export_converter(db_, source_data_row.columns[i]);
+      query_values += source_data_row.columns[i].data_pointer;
+      query_values += "',";
+    } else {
+      throw std::runtime_error("Row number does not match column description");
     }
   }
 
