@@ -28,7 +28,6 @@
 #include "dird/dird_globals.h"
 #include "dird/jcr_private.h"
 #include "dird/job.h"
-#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "include/bareos.h"
 #include "lib/parse_conf.h"

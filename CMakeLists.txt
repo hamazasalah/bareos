@@ -68,6 +68,9 @@ if(BUILD_BAREOS_BINARIES)
   add_subdirectory(core)
   add_subdirectory(webui)
   add_subdirectory(systemtests)
+
+  set(BUILD_SHARED_LIBS yes)
+  add_subdirectory(third-party/googletest)
 endif()
 
 if(docs
