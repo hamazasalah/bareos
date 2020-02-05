@@ -1,0 +1,42 @@
+{
+ "workspace_type": "File System Workspace",
+ "selected_config": "run_rest_server",
+ "name": "pistache",
+ "configs": [{
+   "name": "Debug",
+   "flags": 1,
+   "compile_flags": [],
+   "file_extensions": "*.cpp;*.c;*.txt;*.json;*.hpp;*.cc;*.cxx;*.xml;*.h;*.wxcp",
+   "executable": "/home/franku/01-prj/git/pistache/pistache/build/examples/run_http_server",
+   "arguments": "8080",
+   "environment": "",
+   "compiler": "GCC",
+   "remoteFolder": "",
+   "remoteAccount": "",
+   "targets": [["build", "cd build && make -j8"], ["clean", ""]]
+  }, {
+   "name": "run_http_server",
+   "flags": 1,
+   "compile_flags": [],
+   "file_extensions": "*.cpp;*.c;*.txt;*.json;*.hpp;*.cc;*.cxx;*.xml;*.h;*.wxcp",
+   "executable": "/home/franku/01-prj/git/pistache/pistache/build/examples/run_http_server",
+   "arguments": "8080",
+   "environment": "",
+   "compiler": "GCC",
+   "remoteFolder": "",
+   "remoteAccount": "",
+   "targets": [["build", "cd build && make -j8"], ["clean", ""]]
+  }, {
+   "name": "run_rest_server",
+   "flags": 1,
+   "compile_flags": [],
+   "file_extensions": "*.cpp;*.c;*.txt;*.json;*.hpp;*.cc;*.cxx;*.xml;*.h;*.wxcp",
+   "executable": "/home/franku/01-prj/git/pistache/pistache/build/examples/run_rest_description",
+   "arguments": "8081",
+   "environment": "",
+   "compiler": "GCC",
+   "remoteFolder": "",
+   "remoteAccount": "",
+   "targets": [["build", "cd build && make -j8"], ["clean", ""]]
+  }]
+}

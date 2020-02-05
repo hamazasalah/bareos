@@ -1,0 +1,14 @@
+prefix=
+exec_prefix=
+libdir=/usr/local/lib64/bareos
+includedir=/usr/local/include/bareos
+
+Name: libpistache
+URL: http://pistache.io/
+Description: An elegant C++ REST framework.
+Version: 
+Requires:
+Libs: -L'${libdir}/' 
+Libs.private:
+Cflags: -I'${includedir}/'
+

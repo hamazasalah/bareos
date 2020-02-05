@@ -1,0 +1,23 @@
+OUTPUT_DIRECTORY       = /home/franku/01-prj/git/bareos-master/b/core/docs/
+INPUT                  = /home/franku/01-prj/git/bareos-master/README.md /home/franku/01-prj/git/bareos-master/src/ /home/franku/01-prj/git/bareos-master/include/ /home/franku/01-prj/git/bareos-master/examples/ /home/franku/01-prj/git/bareos-master/docs/
+USE_MDFILE_AS_MAINPAGE = /home/franku/01-prj/git/bareos-master/README.md
+EXCLUDE_PATTERNS       = */.git/*
+EXCLUDE_PATTERNS      += */tests/*
+EXCLUDE_PATTERNS      += */third-party/*
+
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = bareos
+TYPEDEF_HIDES_STRUCT   = YES
+EXTRACT_ALL            = YES
+EXTRACT_LOCAL_CLASSES  = YES
+SHOW_INCLUDE_FILES     = YES
+INLINE_INFO            = YES
+SORT_MEMBER_DOCS       = YES
+GENERATE_TODOLIST      = YES
+GENERATE_BUGLIST       = YES
+GENERATE_DEPRECATEDLIST = YES
+SHOW_USED_FILES        = YES
+SHOW_FILES             = YES
+SHOW_NAMESPACES        = YES
+INPUT_ENCODING         = UTF-8
+RECURSIVE              = YES
