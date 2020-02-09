@@ -71,7 +71,7 @@ void Progress::Advance(std::size_t increment)
 
   auto duration = state_new.start - state_old.start;
 
-  if (state_new.ratio != state_old.ratio) { changed_ = true; }
+  changed_ = state_new.ratio != state_old.ratio;
 
   state_old = state_new;
 }
