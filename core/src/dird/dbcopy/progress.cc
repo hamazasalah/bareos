@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 struct Amount {
   bool is_valid{};
@@ -59,19 +60,28 @@ Progress::Progress(BareosDb* db, const std::string& table_name)
   }
 }
 
-void Progress::Advance(std::size_t increment)
+bool Progress::Increment()
 {
   using Ratio = std::ratio<100, 1>;
 
-  state_new.amount = state_old.amount - increment;
+  state_new.amount = state_old.amount - 1;
   state_new.start = steady_clock::now();
 
   state_new.ratio =
-      (state_new.amount * Ratio::num) / (full_amount_ * Ratio::den);
+      100 - (state_new.amount * Ratio::num) / (full_amount_ * Ratio::den);
 
-  auto duration = state_new.start - state_old.start;
+  std::size_t elapsed_milliseconds =
+      std::chrono::duration_cast<std::chrono::milliseconds>(state_new.start -
+                                                            state_old.start)
+          .count();
 
-  changed_ = state_new.ratio != state_old.ratio;
+  state_new.eta = elapsed_milliseconds * (state_old.amount - state_new.amount) *
+                  state_new.amount;
+
+  bool changed =
+      (state_new.ratio != state_old.ratio) || (state_new.eta != state_old.eta);
 
   state_old = state_new;
+
+  return changed;
 }

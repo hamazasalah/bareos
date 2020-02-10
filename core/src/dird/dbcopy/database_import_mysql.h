@@ -29,7 +29,7 @@ class BareosDb;
 class DatabaseConnection;
 class DatabaseExport;
 class DatabaseTableDescriptions;
-class ResultHandlerContext;
+struct ResultHandlerContext;
 class Progress;
 
 class DatabaseImportMysql : public DatabaseImport {

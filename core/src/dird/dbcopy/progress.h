@@ -37,24 +37,22 @@ struct ProgressState {
   time_point<steady_clock> start{};
   std::size_t amount{};
   std::size_t ratio{};
+  std::size_t eta{};
 };
 
 class Progress {
  public:
   Progress(BareosDb* db, const std::string& table_data);
 
-  void Advance(std::size_t increment);
+  bool Increment();
 
   std::size_t Rate() const { return state_new.ratio; }
-  duration<minutes> RemainingTime() const;
-
-  bool IntegralChange() const { return changed_; }
+  std::size_t RemainingTime() const { return state_new.eta; }
 
  private:
   ProgressState state_new;
   ProgressState state_old;
   std::size_t full_amount_{};
-  bool changed_{};
 
   bool is_valid{};
 };

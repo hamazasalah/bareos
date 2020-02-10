@@ -225,10 +225,9 @@ int DatabaseImportMysql::ResultHandlerCopy(void* ctx, int fields, char** row)
 
   r->exporter.CopyRow(r->row_data);
 
-  r->progress.Advance(1);
-
-  if (r->progress.IntegralChange()) {
-    std::cout << r->progress.Rate() << "%" << std::endl;
+  if (r->progress.Increment()) {
+    std::cout << r->progress.Rate() << "%"
+              << " " << r->progress.RemainingTime() << "ms" << std::endl;
   }
   return 0;
 }
